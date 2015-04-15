@@ -8,6 +8,20 @@ var path = require('path');
 
 module.exports = yeoman.generators.Base.extend({
   initializing: function () {
+    this.log(chalk.red('                         ,╥,') + chalk.yellow('                                        ╥╥'));
+    this.log(chalk.red('                     ,╦╬▓▓▓▓▒') + chalk.blue('               .╥╥╥╗╗╗╗,') + chalk.yellow('          ╥╥▒▒▒▒▒▒'));
+    this.log(chalk.red('                  ╥▒╬▓▓▓▓▓▓▓▒─') + chalk.blue('       .╓╥▒▒╬╫╫╫╫╫╫╫╫╫▒') + chalk.yellow('    .╥▒▒▒▒▒▒▒▒▒▒▒'));
+    this.log(chalk.red('              ,╦╬▓▓▓▓▓▓▓▓▓▓▓▓U') + chalk.blue('  ,╥╗▒▒▓╫╫╫╫╫╫╫╫╫╫╫╫╫▒▒') + chalk.yellow('  ╥▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒'));
+    this.log(chalk.red('           ╥▒╬▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒') + chalk.blue('▒╬╫╫╫╬╬╬╬╫╫╫╫╫╬╬╬╬╬╫╫╫▒') + chalk.yellow('▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒Ñ'));
+    this.log(chalk.red('        ,▒╬▓▓▓▓▓▓▒   ▓▓▓   ▓▓╫╫╫▒ ````²╢▒M`````^╙╫▒▒▒"`    `²▒▒▒▒▒▒▒U'));
+    this.log(chalk.red('      ╥╬▓▓▓▓▓▓▓▓▓▒   ▓▓▓   ▓▓▓╫╫▒  ▒▓▓▒  ▒┐ j╬▓▒≥ :▒"  ╥▒▒▒╥,  ²▒▒▒▒▒'));
+    this.log(chalk.red('    ╦╬▓▓▓▓▓▓▓▓▓▓▓▒   ▓▓▓   ▓▓▓╫╫▒  ╨Å╨" :▒┐ ^╨╨╨  ╥U  j▒▒▒▒▒▒>  ]▒▒▒U'));
+    this.log(chalk.red('    ╨╫▓▓▓▓▓▓▓▓▓▓▓▒   ▓▓▓   ▓▓▓╫╫▒  ╥╥╥╗▒╬▒┐ ╥╗╥  ▒▒▒  ²▒▒▒▒▒▒"  ]▒▒▒'));
+    this.log(chalk.red('     `╨╣╫▓▓▓▓▓▓▓▓▒         ▓▓▓▓╫▒ .╫▓▒▒╫╫▒┐ ]╫▓m  ╨▒╥  `²╨╨"   ▒▒▒▒U'));
+    this.log(chalk.red('           `╙╝╣╫▓▓▓▓▓▓▓▓▓▓▓▓▓▒⌂ `╨╣╫╫╫╫╫╫╫╫╫╫╫╫▒▒╨▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒U'));
+    this.log(chalk.red('               ^╙╩╣╫▓▓▓▓▓▓▓▓▓▒     ^ß╣╫╫╫╫╫╫╫╫▒▒    ²╨▒▒▒▒▒▒▒▒▒▒▒▒Ü'));
+    this.log(chalk.red('                   `²╨╝╣╬╬▓▓▓Ü        `²╨╫╬╬╬╬▒`       `²╨▒▒▒▒▒▒▒▒'));
+    this.log(chalk.red('Author: Edouard CHIN'));
     var done = this.async();
     this.scriptPath = path.join(this.sourceRoot(), '..', 'packageChecker.sh');
     this.packages = [
@@ -21,9 +35,9 @@ module.exports = yeoman.generators.Base.extend({
       'php5-curl',
       'mysql-server',
       'git',
-      // 'unison',
+      'unison',
       'npm',
-      // 'nodejs-legacy',
+      'nodejs-legacy',
       'xclip',
       'openjdk-7-jre-headless',
       'elasticsearch',
@@ -104,46 +118,46 @@ module.exports = yeoman.generators.Base.extend({
         this.nginxName = answer.serverName;
         done();
       }.bind(this));
+    },
+
+    checkPackages: function () {
+      var done = this.async();
+      var packages = this.packages;
+      packages.unshift(this.scriptPath)
+      var self = this;
+      execFile('bash', packages, function (err, stdout, stderr) {
+        var packages = stdout.split("\n");
+        packages.pop();
+        self.packagesToInstall = packages;
+        done();
+      });
+    },
+
+    confirmMissingPackages: function () {
+      if (!this.packagesToInstall.length) {
+        return ;
+      }
+      var options = {
+        name: 'packages',
+        type: 'confirm',
+        message: 'The following packages are missing on your system: ' + chalk.red(this.packagesToInstall) + '. Would you like me to install them for you?'
+      };
+      var done = this.async();
+      this.prompt(options, function (answer) {
+      this.installPackages = answer.packages;
+        done();
+      }.bind(this));
     }
-
-    // checkPackages: function () {
-    //   var done = this.async();
-    //   var packages = this.packages;
-    //   packages.unshift(this.scriptPath)
-    //   var self = this;
-    //   execFile('bash', packages, function (err, stdout, stderr) {
-    //     var packages = stdout.split("\n");
-    //     packages.pop();
-    //     self.packagesToInstall = packages;
-    //     done();
-    //   });
-    // },
-
-    // confirmMissingPackages: function () {
-    //   if (!this.packagesToInstall.length) {
-    //     return ;
-    //   }
-    //   var options = {
-    //     name: 'packages',
-    //     type: 'confirm',
-    //     message: 'The following packages are missing on your system: ' + chalk.red(this.packagesToInstall) + '. Would you like me to install them for you?'
-    //   };
-    //   var done = this.async();
-    //   this.prompt(options, function (answer) {
-    //   this.installPackages = answer.packages;
-    //     done();
-    //   }.bind(this));
-    // }
   },
 
   writing: {
-    // cloningProject: function () {
-    //   var done = this.async();
-    //   chalk.red('Cloning the project');
-    //   this.spawnCommand('git', ['clone', this.gitProject[this.project]]).on('close', function () {
-    //     done();
-    //   })
-    // },
+    cloningProject: function () {
+      var done = this.async();
+      chalk.red('Cloning the project');
+      this.spawnCommand('git', ['clone', this.gitProject[this.project]]).on('close', function () {
+        done();
+      })
+    },
 
     createDirectories: function () {
       process.chdir(this.projectDir);
@@ -163,41 +177,80 @@ module.exports = yeoman.generators.Base.extend({
       })
     },
 
-    // downloadComposer: function () {
-    //   console.log(chalk.green('Downloading composer...'));
-    //   var done = this.async();
-    //   exec('php -r "readfile(\'https://getcomposer.org/installer\');" | php', [], function () {
-    //       done();
-    //   });
-    // }
+    downloadComposer: function () {
+      console.log(chalk.green('Downloading composer...'));
+      var done = this.async();
+      exec('php -r "readfile(\'https://getcomposer.org/installer\');" | php', [], function () {
+          done();
+      });
+    }
   },
   install: {
-    // installMissingPackages: function () {
-    //   if (this.installPackages) {
-    //     console.log(chalk.green('Installing missing packages'));
-    //     var done = this.async();
-    //     var packages = this.packagesToInstall;
-    //     packages.unshift('install');
-    //     packages.unshift('apt-get');
-    //     console.log(packages);
-    //     this.spawnCommand('sudo', packages).on('close', function () {
-    //       done();
-    //     });
-    //   }
-    // },
+    installMissingPackages: function () {
+      if (this.installPackages) {
+        console.log(chalk.green('Installing missing packages'));
+        var done = this.async();
+        var packages = this.packagesToInstall;
+        packages.unshift('install');
+        packages.unshift('apt-get');
+        console.log(packages);
+        this.spawnCommand('sudo', packages).on('close', function () {
+          done();
+        });
+      }
+    },
 
     createFiles: function () {
       if (!this.installNginxConf) {
         return;
       }
       this.template('nginx', 'nginx');
-      exec('sudo mv nginx /etc/nginx/sites-enabled/' + this.project);
-      console.log(chalk.green('Successfuly created the nginx configuration under /etc/nginx/sites-enabled/' + this.project));
     },
 
-    // installVendor: function () {
-    //   var done = this.async();
-    //   this.spawnCommand('php', ['composer.phar', 'install']).on('close', done);
-    // }
+    nginx: function () {
+      if (!this.installNginxConf) {
+        return;
+      }
+      var done = this.async();
+      var self = this;
+      exec('sudo mv nginx /etc/nginx/sites-enabled/' + this.project, function (err, stdout, stderr) {
+        console.log(chalk.green('Successfuly created the nginx configuration under /etc/nginx/sites-enabled/' + self.project));
+        done();
+      });
+    },
+
+    installVendor: function () {
+      var done = this.async();
+      this.spawnCommand('php', ['composer.phar', 'install']).on('close', done);
+    },
+
+    createDatabase: function () {
+      var done = this.async();
+      this.spawnCommand('php', ['app/console', 'doctrine:database:create']).on('close', function () {
+        done();
+      })
+    },
+
+    resetDb: function () {
+      var done = this.async();
+      this.spawnCommand('bash', ['reset_db.sh']).on('close', function () {
+        done();
+      });
+    },
+
+    restartingNginx: function () {
+      var done = this.async();
+      exec('sudo service nginx restart', [], function (err, stdout, stderr) {
+        console.log(stdout);
+        done();
+      })
+    },
+
+    finishing: function () {
+      console.log(yosay('Thank you, everything was setup correctly. You are ready to go!'));
+      if (this.installNginxConf) {
+        console.log(chalk.blue('Please add this line    ') + chalk.yellow('127.0.0.1      ' + this.nginxName) + chalk.blue(' in your /etc/hosts file.'));
+      }
+    }
   }
 });
