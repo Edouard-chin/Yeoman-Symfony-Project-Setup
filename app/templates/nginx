@@ -1,0 +1,46 @@
+server {
+    listen 80;
+    server_name <%= nginxName %>;
+    root <%= projectDir %>/web;
+
+    client_max_body_size 1024M;
+
+    #    Do not log access to robots.txt, to keep the logs cleaner
+    location = /robots.txt { access_log off; log_not_found off; }
+
+    #    Do not log access to the favicon, to keep the logs cleaner
+    location = /favicon.ico { access_log off; log_not_found off; }
+
+    location / {
+        try_files $uri @rewriteapp;
+    }
+
+    location @rewriteapp {
+        # rewrite all to app.php
+        rewrite ^(.*)$ /app.php/$1 last;
+    }
+
+    location ^~ /file/progress {
+        # report uploads tracked in the 'proxied' zone
+        report_uploads upro_file_bundle_proxied;
+    }
+
+    location /upro_file {
+        internal;
+        alias <%= projectDir %>/app/files;
+    }
+
+    location /web_private {
+        internal;
+        alias <%= projectDir %>/web_private;
+    }
+
+    location ~ ^/(app|app_dev|config)\.php(/|$) {
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_split_path_info ^(.+\.php)(/.*)$;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param HTTPS off;
+        track_uploads upro_file_bundle_proxied 30s;
+    }
+}
