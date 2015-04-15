@@ -193,7 +193,6 @@ module.exports = yeoman.generators.Base.extend({
         var packages = this.packagesToInstall;
         packages.unshift('install');
         packages.unshift('apt-get');
-        console.log(packages);
         this.spawnCommand('sudo', packages).on('close', function () {
           done();
         });
