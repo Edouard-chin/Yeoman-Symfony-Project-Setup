@@ -45,7 +45,7 @@ module.exports = yeoman.generators.Base.extend({
     this.gitProject = {
       'dudek': '..',
       'pouet': '..',
-      'pouet': '..'
+      'tik': '..'
     };
     console.log(chalk.blue('Your super user password may be required if not yet cached. Please input it, if it is the case. I need it to install missing packages/dependecies and setting proper rights on folders.'));
     this.spawnCommand('sudo', ['echo']).on('close', function () {
