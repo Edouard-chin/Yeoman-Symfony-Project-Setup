@@ -43,9 +43,9 @@ module.exports = yeoman.generators.Base.extend({
       'elasticsearch',
     ];
     this.gitProject = {
-      'dudek': '..',
-      'pouet': '..',
-      'tik': '..'
+      'digitalevent': 'git@github.com:upro/digitalevent.git',
+      'netexplo-academy': 'git@github.com:upro/netexplo-academy.git',
+      'netexplo-channel': 'git@github.com:upro/netexplo-channel.git'
     };
     console.log(chalk.blue('Your super user password may be required if not yet cached. Please input it, if it is the case. I need it to install missing packages/dependecies and setting proper rights on folders.'));
     this.spawnCommand('sudo', ['echo']).on('close', function () {
@@ -92,9 +92,9 @@ module.exports = yeoman.generators.Base.extend({
       var done = this.async();
       var options = [
           {
-              type: 'confirm',
-              name: 'nginx',
-              message: 'Would you like me to setup the nginx configuration?'
+            type: 'confirm',
+            name: 'nginx',
+            message: 'Would you like me to setup the nginx configuration?'
           }
       ];
       this.prompt(options, function (answer) {
@@ -199,9 +199,36 @@ module.exports = yeoman.generators.Base.extend({
       }
     },
 
+    checkNpmPackages: function () {
+      var re = new RegExp("empty", 'i');
+      exec('npm -g list less', [], function (err, stdout, stderr) {
+        if (re.test(stdout)) {
+          console.log(chalk.green('Installing less'));
+          exec('sudo npm -g install less');
+        }
+      })
+      exec('npm -g list uglify-js', [], function (err, stdout, stderr) {
+        if (re.test(stdout)) {
+          exec('sudo npm -g install uglify-js');
+        }
+      })
+      exec('npm -g list uglifycss', [], function (err, stdout, stderr) {
+        if (re.test(stdout)) {
+          exec('sudo npm -g install uglifycss');
+        }
+      })
+    },
+
     createFiles: function () {
       if (!this.installNginxConf) {
         return;
+      }
+      var nginxConf = this.readFileAsString('/etc/nginx/nginx.conf');
+      var re = new RegExp('upload_progress (.*)? \\d{1}\\w');
+      if (re.test(nginxConf)) {
+        this.uploadProgress = {exists: true, name: re.exec(nginxConf)[1]};
+      } else {
+        this.uploadProgress = {exists: false, name: this.project + '_proxied'};
       }
       this.template('nginx', 'nginx');
     },

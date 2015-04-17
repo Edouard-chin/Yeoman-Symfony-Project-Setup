@@ -1,3 +1,7 @@
+<% if (!uploadProgress.exists) { %># for fileBundle
+upload_progress <%= uploadProgress.name %> 1m;
+upload_progress_json_output;
+<% } %>
 server {
     listen 80;
     server_name <%= nginxName %>;
@@ -22,7 +26,7 @@ server {
 
     location ^~ /file/progress {
         # report uploads tracked in the 'proxied' zone
-        report_uploads upro_file_bundle_proxied;
+        report_uploads <%= uploadProgress.name %>;
     }
 
     location /upro_file {
@@ -41,6 +45,6 @@ server {
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_param HTTPS off;
-        track_uploads upro_file_bundle_proxied 30s;
+        track_uploads <%= uploadProgress.name %> 30s;
     }
 }
