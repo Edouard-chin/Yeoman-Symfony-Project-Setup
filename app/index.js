@@ -51,7 +51,7 @@ module.exports = yeoman.generators.Base.extend({
       'Arch Linux': [
         'pacman',
         '-S',
-        'pacman -Q',
+        'pacman -Qi',
         'Version',
         [
           'nginx',
@@ -205,14 +205,6 @@ module.exports = yeoman.generators.Base.extend({
         exec('sudo setfacl -R -m u:' + user + ':rwX -m u:`whoami`:rwX app/cache app/logs app/tmp app/files app/var/sessions web_private');
         exec('sudo setfacl -dR -m u:' + user + ':rwX -m u:`whoami`:rwX app/cache app/logs app/tmp app/files app/var/sessions web_private');
       })
-    },
-
-    downloadComposer: function () {
-      console.log(chalk.green('Downloading composer...'));
-      var done = this.async();
-      exec('php -r "readfile(\'https://getcomposer.org/installer\');" | php', [], function () {
-          done();
-      });
     }
   },
   install: {
@@ -227,6 +219,14 @@ module.exports = yeoman.generators.Base.extend({
           done();
         });
       }
+    },
+
+    downloadComposer: function () {
+      console.log(chalk.green('Downloading composer...'));
+      var done = this.async();
+      exec('php -r "readfile(\'https://getcomposer.org/installer\');" | php', [], function () {
+          done();
+      });
     },
 
     checkNpmPackages: function () {
