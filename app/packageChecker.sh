@@ -1,8 +1,8 @@
 #!/bin/bash
 
-for var in "$@"
+for var in "${@:3}"
 do
-	if [ $(dpkg-query -W -f='${Status}' $var 2>/dev/null | grep -c "install ok installed") -eq 0 ];
+	if [ $($1 $var 2>/dev/null | grep -c "$2") -eq 0 ];
 	then
 		echo $var
 	fi

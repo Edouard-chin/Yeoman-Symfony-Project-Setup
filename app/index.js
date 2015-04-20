@@ -42,12 +42,20 @@ module.exports = yeoman.generators.Base.extend({
       'openjdk-7-jre-headless',
       'elasticsearch',
     ];
+    this.packageManager = {
+      'Ubuntu': ['apt-get', 'install', "dpkg-query -W -f='\${Status}'", 'install ok installed'],
+      'Arch Linux': ['pacman', '-S', 'pacman -Q', 'was not found']
+    };
     this.gitProject = {
       'digitalevent': 'git@github.com:upro/digitalevent.git',
       'netexplo-academy': 'git@github.com:upro/netexplo-academy.git',
       'netexplo-channel': 'git@github.com:upro/netexplo-channel.git'
     };
     console.log(chalk.blue('Your super user password may be required if not yet cached. Please input it, if it is the case. I need it to install missing packages/dependecies and setting proper rights on folders.'));
+    var release = this.readFileAsString('/etc/os-release');
+    var re = new RegExp('NAME="(.*)?"');
+    this.distrib = re.exec(release)[1];
+    console.log(chalk.green('You are running on ' + this.distrib));
     this.spawnCommand('sudo', ['echo']).on('close', function () {
       console.log(chalk.green('Thank you, we are ready to start'));
       done();
@@ -123,7 +131,9 @@ module.exports = yeoman.generators.Base.extend({
     checkPackages: function () {
       var done = this.async();
       var packages = this.packages;
-      packages.unshift(this.scriptPath)
+      packages.unshift(this.packageManager[this.distrib][3]);
+      packages.unshift(this.packageManager[this.distrib][2]);
+      packages.unshift(this.scriptPath);
       var self = this;
       execFile('bash', packages, function (err, stdout, stderr) {
         var packages = stdout.split("\n");
@@ -191,8 +201,8 @@ module.exports = yeoman.generators.Base.extend({
         console.log(chalk.green('Installing missing packages'));
         var done = this.async();
         var packages = this.packagesToInstall;
-        packages.unshift('install');
-        packages.unshift('apt-get');
+        packages.unshift(this.packageManager[this.distrib][1]);
+        packages.unshift(this.packageManager[this.distrib][0]);
         this.spawnCommand('sudo', packages).on('close', function () {
           done();
         });
