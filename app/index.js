@@ -24,27 +24,46 @@ module.exports = yeoman.generators.Base.extend({
     this.log(chalk.red('Author: Edouard CHIN'));
     var done = this.async();
     this.scriptPath = path.join(this.sourceRoot(), '..', 'packageChecker.sh');
-    this.packages = [
-      'nginx-extras',
-      'php5-fpm',
-      'php5-mysql',
-      'php5-cli',
-      'php-apc',
-      'php5-intl',
-      'php5-gd',
-      'php5-curl',
-      'mysql-server',
-      'git',
-      'unison',
-      'npm',
-      'nodejs-legacy',
-      'xclip',
-      'openjdk-7-jre-headless',
-      'elasticsearch',
-    ];
     this.packageManager = {
-      'Ubuntu': ['apt-get', 'install', "dpkg-query -W -f='\${Status}'", 'install ok installed'],
-      'Arch Linux': ['pacman', '-S', 'pacman -Q', 'was not found']
+      'Ubuntu': [
+        'apt-get',
+        'install',
+        "dpkg-query -W -f='\${Status}'",
+        'install ok installed',
+        [
+          'nginx-extras',
+          'php5-fpm',
+          'php5-mysql',
+          'php5-cli',
+          'php-apc',
+          'php5-intl',
+          'php5-gd',
+          'php5-curl',
+          'mysql-server',
+          'git',
+          'unison',
+          'npm',
+          'nodejs-legacy',
+          'openjdk-7-jre-headless',
+          'elasticsearch'
+        ]
+      ],
+      'Arch Linux': [
+        'pacman',
+        '-S',
+        'pacman -Q',
+        'Version',
+        [
+          'nginx',
+          'mysql',
+          'php',
+          'git',
+          'unison',
+          'nodejs',
+          'jre7-openjdk-headless',
+          'elasticsearch'
+        ]
+      ]
     };
     this.gitProject = {
       'digitalevent': 'git@github.com:upro/digitalevent.git',
@@ -130,9 +149,10 @@ module.exports = yeoman.generators.Base.extend({
 
     checkPackages: function () {
       var done = this.async();
-      var packages = this.packages;
-      packages.unshift(this.packageManager[this.distrib][3]);
-      packages.unshift(this.packageManager[this.distrib][2]);
+      var distribSpecific = this.packageManager[this.distrib];
+      var packages = distribSpecific[4];
+      packages.unshift(distribSpecific[3]);
+      packages.unshift(distribSpecific[2]);
       packages.unshift(this.scriptPath);
       var self = this;
       execFile('bash', packages, function (err, stdout, stderr) {
