@@ -45,7 +45,8 @@ module.exports = yeoman.generators.Base.extend({
                     'npm',
                     'nodejs-legacy',
                     'openjdk-7-jre-headless',
-                    'elasticsearch'
+                    'elasticsearch',
+                    'acl'
                 ]
             ],
             'Arch Linux': [
@@ -198,13 +199,6 @@ module.exports = yeoman.generators.Base.extend({
             this.mkdir('app/files');
             this.mkdir('app/var/sessions');
             this.mkdir('web_private');
-            console.log(chalk.green('Setting facl'));
-            exec('ps aux | grep -E \'[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx\' | grep -v root | head -1 | cut -d\ \' \' -f1', [], function (err, stdout, stderr) {
-                var data = stdout.split("\n");
-                var user = data[0];
-                exec('sudo setfacl -R -m u:' + user + ':rwX -m u:`whoami`:rwX app/cache app/logs app/tmp app/files app/var/sessions web_private');
-                exec('sudo setfacl -dR -m u:' + user + ':rwX -m u:`whoami`:rwX app/cache app/logs app/tmp app/files app/var/sessions web_private');
-            })
         }
     },
     install: {
@@ -219,6 +213,16 @@ module.exports = yeoman.generators.Base.extend({
                     done();
                 });
             }
+        },
+
+        setPermissions: function () {
+            console.log(chalk.green('Setting facl'));
+            exec('ps aux | grep -E \'[a]pache|[h]ttpd|[_]www|[w]ww-data|[n]ginx\' | grep -v root | head -1 | cut -d\ \' \' -f1', [], function (err, stdout, stderr) {
+                var data = stdout.split("\n");
+                var user = data[0];
+                exec('sudo setfacl -R -m u:' + user + ':rwX -m u:`whoami`:rwX app/cache app/logs app/tmp app/files app/var/sessions web_private');
+                exec('sudo setfacl -dR -m u:' + user + ':rwX -m u:`whoami`:rwX app/cache app/logs app/tmp app/files app/var/sessions web_private');
+            })
         },
 
         downloadComposer: function () {
