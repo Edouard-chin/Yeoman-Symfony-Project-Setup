@@ -44,8 +44,8 @@ module.exports = yeoman.generators.Base.extend({
                     'unison',
                     'npm',
                     'nodejs-legacy',
-                    'openjdk-7-jre-headless',
-                    'elasticsearch',
+                    // 'openjdk-7-jre-headless',
+                    // 'elasticsearch',
                     'acl'
                 ]
             ],
