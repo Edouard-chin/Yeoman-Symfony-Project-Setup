@@ -49,7 +49,7 @@ module.exports = yeoman.generators.Base.extend({
                     'acl'
                 ]
             ],
-            'Arch Linux': [
+            'ArchBang-Rc Linux': [
                 'pacman',
                 '-S',
                 'pacman -Qi',
