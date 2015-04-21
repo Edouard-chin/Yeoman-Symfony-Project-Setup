@@ -61,8 +61,6 @@ module.exports = yeoman.generators.Base.extend({
                     'git',
                     'unison',
                     'nodejs',
-                    'jre7-openjdk-headless',
-                    'elasticsearch'
                 ]
             ]
         };
@@ -211,7 +209,7 @@ module.exports = yeoman.generators.Base.extend({
     },
     install: {
         checkElasticSearch: function () {
-            if (this.isElasticsearchInstalled || !this.installPackages) {
+            if (this.isElasticsearchInstalled || !this.installPackages || this.distrib == 'ArchBang-Rc Linux') {
                 return;
             }
             var sourcesList = this.readFileAsString('/etc/apt/sources.list');
@@ -227,20 +225,14 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         updatePackages: function () {
-            if (this.isElasticsearchInstalled || !this.installPackages) {
+            if (this.isElasticsearchInstalled || !this.installPackages || this.distrib == 'ArchBang-Rc Linux') {
                 return;
             }
             var done = this.async();
             console.log(chalk.green('Updating packages'));
-            if (this.distrib == "Ubuntu") {
-                exec('sudo apt-get update', [], function () {
-                    done();
-                })
-            } else if (this.distrib == 'ArchBang-Rc Linux') {
-                exec('sudo pacman -Syyu', [], function () {
-                    done();
-                })
-            }
+            exec('sudo apt-get update', [], function () {
+                done();
+            })
         },
 
         installMissingPackages: function () {
