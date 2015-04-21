@@ -13,7 +13,9 @@ Yeoman travels light. He didn't pack any generators when he moved in. You can th
 To install generator-fast-setup from npm, run:
 
 ```bash
-npm install -g generator-fast-setup
+git clone git@github.com:upro/edouard-yeoman.git
+cd Yeoman-Symfony-Project-Setup
+sudo npm link
 ```
 
 Finally, initiate the generator:
@@ -34,6 +36,9 @@ Suited for our needs at the office, it automatically setup a symfony project, he
 - Setting facl
 - Download composer
 - Install vendor dependencies
+- Install npm dependencies
 - Create database
 - Create database schema
 - Loading fixtures
+
+Tested and working on Ubuntu / Fedora / Arch linux
