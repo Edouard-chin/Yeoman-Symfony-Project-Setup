@@ -209,7 +209,7 @@ module.exports = yeoman.generators.Base.extend({
     },
     install: {
         checkElasticSearch: function () {
-            if (this.isElasticsearchInstalled || !this.installPackages || this.distrib == 'ArchBang-Rc Linux') {
+            if (this.isElasticsearchInstalled || !this.installPackages) {
                 return;
             }
             var sourcesList = this.readFileAsString('/etc/apt/sources.list');
@@ -225,7 +225,7 @@ module.exports = yeoman.generators.Base.extend({
         },
 
         updatePackages: function () {
-            if (this.isElasticsearchInstalled || !this.installPackages || this.distrib == 'ArchBang-Rc Linux') {
+            if (this.isElasticsearchInstalled || !this.installPackages) {
                 return;
             }
             var done = this.async();
