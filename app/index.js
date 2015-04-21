@@ -44,8 +44,8 @@ module.exports = yeoman.generators.Base.extend({
                     'unison',
                     'npm',
                     'nodejs-legacy',
-                    // 'openjdk-7-jre-headless',
-                    // 'elasticsearch',
+                    'openjdk-7-jre-headless',
+                    'elasticsearch',
                     'acl'
                 ]
             ],
@@ -137,13 +137,19 @@ module.exports = yeoman.generators.Base.extend({
             }
             var done = this.async();
             var options = [
-            {
-                name: 'serverName',
-                message: 'Please input the server name to create the nginx configuration'
-            }
+                {
+                    name: 'serverName',
+                    message: 'Please input the server name to create the nginx configuration'
+                },
+                {
+                    name: 'serverPort',
+                    message: 'Please input the port the server is going to listen to',
+                    default: 80
+                }
             ];
             this.prompt(options, function (answer) {
                 this.nginxName = answer.serverName;
+                this.nginxPort = answer.serverPort;
                 done();
             }.bind(this));
         },
@@ -157,6 +163,8 @@ module.exports = yeoman.generators.Base.extend({
             packages.unshift(this.scriptPath);
             var self = this;
             execFile('bash', packages, function (err, stdout, stderr) {
+                var re = new RegExp('elasticsearch');
+                self.isElasticsearchInstalled = !re.test(stdout);
                 var packages = stdout.split("\n");
                 packages.pop();
                 self.packagesToInstall = packages;
@@ -202,6 +210,39 @@ module.exports = yeoman.generators.Base.extend({
         }
     },
     install: {
+        checkElasticSearch: function () {
+            if (this.isElasticsearchInstalled || !this.installPackages) {
+                return;
+            }
+            var sourcesList = this.readFileAsString('/etc/apt/sources.list');
+            var re = new RegExp('elasticsearch\/.*?\/');
+            if (re.test(sourcesList)) {
+                return;
+            }
+            var done = this.async();
+            console.log(chalk.green('Writing elasticsearch repo in sources.list'));
+            exec('echo "deb http://packages.elasticsearch.org/elasticsearch/1.5/debian stable main" | sudo tee -a /etc/apt/sources.list', [], function () {
+                done();
+            })
+        },
+
+        updatePackages: function () {
+            if (this.isElasticsearchInstalled || !this.installPackages) {
+                return;
+            }
+            var done = this.async();
+            console.log(chalk.green('Updating packages'));
+            if (this.distrib == "Ubuntu") {
+                exec('sudo apt-get update', [], function () {
+                    done();
+                })
+            } else if (this.distrib == 'ArchBang-Rc Linux') {
+                exec('sudo pacman -Syyu', [], function () {
+                    done();
+                })
+            }
+        },
+
         installMissingPackages: function () {
             if (this.installPackages) {
                 console.log(chalk.green('Installing missing packages'));
